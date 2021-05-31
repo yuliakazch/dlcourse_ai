@@ -100,17 +100,21 @@ class Trainer:
                 # use model to generate loss and gradients for all
                 # the params
 
-                raise Exception("Not implemented!")
+                X_batch, y_batch = self.dataset.train_X[batch_indices], self.dataset.train_y[batch_indices]
+
+                loss = self.model.compute_loss_and_gradients(X=X_batch, y=y_batch)
 
                 for param_name, param in self.model.params().items():
                     optimizer = self.optimizers[param_name]
+                    # print(param_name, param.value.sum())
                     param.value = optimizer.update(param.value, param.grad, self.learning_rate)
+                    # print(param_name, param.value.sum())
 
                 batch_losses.append(loss)
 
             if np.not_equal(self.learning_rate_decay, 1.0):
                 # TODO: Implement learning rate decay
-                raise Exception("Not implemented!")
+                self.learning_rate *= self.learning_rate_decay
 
             ave_loss = np.mean(batch_losses)
 
@@ -128,3 +132,5 @@ class Trainer:
             val_acc_history.append(val_accuracy)
 
         return loss_history, train_acc_history, val_acc_history
+
+    

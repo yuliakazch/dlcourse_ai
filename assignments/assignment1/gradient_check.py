@@ -32,13 +32,18 @@ def check_gradient(f, x, delta=1e-5, tol = 1e-4):
     while not it.finished:
         ix = it.multi_index
         analytic_grad_at_ix = analytic_grad[ix]
-        numeric_grad_at_ix = 0
-
+        mask = np.zeros(x.shape)
+        mask[ix]=delta
+        x_plus = x+mask
+        x_minus = x-mask
+        f_plus = f(x_plus)
+        f_minus = f(x_minus)
+        numeric_grad_at_ix = (f_plus[0]-f_minus[0])/(2*delta)
         # TODO compute value of numeric gradient of f to idx
         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
             print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (ix, analytic_grad_at_ix, numeric_grad_at_ix))
             return False
-
+        print("Gradients are not different at %s. Analytic: %2.5f, Numeric: %2.5f" % (ix, analytic_grad_at_ix, numeric_grad_at_ix))
         it.iternext()
 
     print("Gradient check passed!")
